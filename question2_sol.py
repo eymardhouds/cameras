@@ -1,5 +1,14 @@
 import math
 
+# On définit un quadrillage au maillage epsilon et on fait varier (x_max-x_min)/epsilon
+# Puis itérativement:
+    # On calcule la densité de tableaux surveillés par camera , par type de camera (appelé matrice de densité, density_matrice)
+    # On selectionne le max et on retire les cameras, on update la matrice de densité
+    # Arrêt de la boucle for: quand tous les tableaux sont surveillés
+
+# (On répète plusieurs fois et on sélectionne la meilleure réponse)
+# idée: un facteur température: on commence par placer des cameras au hasard puis on fait notre algo
+
 def get_distances(points):
     distances={}
     for point1 in points:
@@ -10,7 +19,6 @@ def get_distances(points):
                 square_dist=math.pow(point1[0]-point2[0],2)+math.pow(point1[1]-point2[1],2)
                 distances[point1][point2]=math.sqrt(square_dist)
     return distances
-
 
 if __name__ == '__main__':
 
