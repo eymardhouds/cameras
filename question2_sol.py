@@ -1,14 +1,5 @@
 import math
 
-# On définit un quadrillage au maillage epsilon et on fait varier (x_max-x_min)/epsilon
-# Puis itérativement:
-    # On calcule la densité de tableaux surveillés par camera , par type de camera (appelé matrice de densité, density_matrice)
-    # On selectionne le max et on retire les cameras, on update la matrice de densité
-    # Arrêt de la boucle for: quand tous les tableaux sont surveillés
-
-# (On répète plusieurs fois et on sélectionne la meilleure réponse)
-# idée: un facteur température: on commence par placer des cameras au hasard puis on fait notre algo
-
 class museum():
 
     def __init__(self,epsilon,oeuvres,p_dist,g_dist,p_price,g_price):
