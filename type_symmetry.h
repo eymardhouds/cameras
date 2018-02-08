@@ -1,0 +1,1 @@
+/Users/eymardhoudeville/Documents/Centrale/Info/optim/scip/include/type_symmetry.h

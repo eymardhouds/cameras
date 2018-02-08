@@ -6,8 +6,9 @@ Janvier 2017 <hr></i></p>
 __Auteur__ : Eymard Houdeville, Antoine Aubay<br>
 
 ## Index
-1. [Programmation linéaire à variables entières](#description)
-2. [Recherche locale](#A)
+1. [Introduction](#intro)
+2. [Programmation linéaire à variables entières](#description)
+3. [Recherche locale](#A)
 
 
 ## <a name="intro"></a>1. Introduction
