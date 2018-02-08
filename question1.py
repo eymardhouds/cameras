@@ -2,7 +2,6 @@ import math
 from pyscipopt import Model, quicksum, multidict
 import time
 
-
 class Museum:
 
     def __init__(self, epsilon, file):
@@ -119,19 +118,6 @@ class Museum:
 
         return camera_list
 
-    @property
-    def cost(self):
-
-        cost = 0
-        for i in self.quadrillage_p.values():
-            if self.model.getVal(i):
-                cost += self.p_price
-
-        for i in self.quadrillage_g.values():
-            if self.model.getVal(i):
-                cost += self.g_price
-
-        return cost
 
     def write_result(self, file_name):
 
@@ -150,12 +136,15 @@ class Museum:
 
 if __name__ == '__main__':
     start = time.time()
-    museum = Museum(1, 'input_simple.txt')
+    museum = Museum(0.5, 'input_9.txt')
     museum.add_constraints()
+    stop1 = time.time()
     museum.solve()
-    stop = time.time()
-    print("Cost = " + str(museum.cost))
+    stop2 = time.time()
+    print("Init time = ", stop1 - start)
+    print("Solving time = ", stop2 - stop1)
+    print("Execution time = ", stop2 - start)
     museum.write_result("result.txt")
-    print("Execution time = ", stop - start)
+
 
 

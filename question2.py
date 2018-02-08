@@ -145,13 +145,8 @@ class Museum:
 
         result = ""
 
-        for coord, valeur in self.quadrillage_p.items():
-            if self.model.getVal(valeur)  == True:
-                result += ("1" + "," + str(coord[0]) + "," + str(coord[1]) + "\n")
-
-        for coord, valeur in self.quadrillage_g.items():
-            if self.model.getVal(valeur)  == True:
-                result += ("2" + "," + str(coord[0]) + "," + str(coord[1]) + "\n")
+        for camera in self.present_cameras:
+            result += (str(camera.price) + "," + str(camera.coord)[1:-1] + "\n")
 
         with open(file_name, "w") as result_file:
             result_file.write(result)
@@ -159,9 +154,13 @@ class Museum:
 if __name__ == '__main__':
     start = time.time()
     museum = Museum(2, 'input_9.txt')
+    stop1 = time.time()
     museum.first_solve()
-    stop = time.time()
+    stop2 = time.time()
     print("Cost = " + str(museum.total_cost))
-    print("Execution time = ", stop - start)
+    print("Init time = ", stop1 - start)
+    print("Solving time = ", stop2 - stop1)
+    print("Execution time = ", stop2 - start)
+    museum.write_result("result2.txt")
 
 
