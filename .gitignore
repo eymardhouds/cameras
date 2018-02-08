@@ -1,2 +1,4 @@
 *.dylib
 symmetry
+type_symmetry
+type_symmetry.h
