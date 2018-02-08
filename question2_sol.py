@@ -42,11 +42,17 @@ class museum():
 
         print("l = %.1f" % self.l)
 
-        for x in range(0,self.L,self.epsilon):
-            for y in range(0,self.l,self.epsilon):
+        for x in range(self.min_x,self.max_x +1,self.epsilon):
+            for y in range(self.min_y,self.max_y,self.epsilon):
                 self.quadrillage.append((x,y))
 
         return self.quadrillage
+
+
+
+
+
+
 
     def compute_density(i):
         density=0
