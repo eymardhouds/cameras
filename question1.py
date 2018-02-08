@@ -21,8 +21,6 @@ class Museum:
 
         self.id = 0
         self.epsilon = epsilon
-        print(self.p_dist)
-        print(self.oeuvres)
 
         self.model = Model("Camera")
 
@@ -66,6 +64,7 @@ class Museum:
 
     def add_constraints(self):
         for o in self.oeuvres:
+            print("adding")
             cam_list = self.fetch_close_cam(o)
             self.model.addCons(quicksum(cam_list[i] for i in range(len(cam_list))) >= 1, "present camera")
 
@@ -151,7 +150,7 @@ class Museum:
 
 if __name__ == '__main__':
     start = time.time()
-    museum = Museum(1, 'input_9.txt')
+    museum = Museum(1, 'input_simple.txt')
     museum.add_constraints()
     museum.solve()
     stop = time.time()

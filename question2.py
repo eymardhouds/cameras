@@ -1,6 +1,6 @@
 import math
-from pyscipopt import Model, quicksum, multidict
 import time
+
 
 
 class Camera:
@@ -15,7 +15,7 @@ class Camera:
 class Museum:
 
     def __init__(self, epsilon, file):
-        #self.distances = get_distnaces(oeuvres)
+
 
         with open(file, 'r') as doc:
             content = doc.readlines()
@@ -24,20 +24,19 @@ class Museum:
         self.g_dist = int(content[0].split(',')[1])
         self.p_price = int(content[1].split(',')[0])
         self.g_price = int(content[1].split(',')[1])
-        self.non_covered = []
         self.oeuvre = {}
         for line in content[2:]:
-            self.oeuvre[(int(line.split(',')[0]), int(line.split(',')[1]))] = (False, [])
+            self.oeuvre[(int(line.split(',')[0]), int(line.split(',')[1]))] = [False, []]
 
         self.id = 0
         self.epsilon = epsilon
-        print(self.p_dist)
-        print(self.non_covered)
 
         self.present_cameras = []
 
         self.absent_cameras = self.get_cameras(self.p_price)
         self.absent_cameras += self.get_cameras(self.g_price)
+
+        self.total_cost = 0
 
         print("Epsilon = %.1f" % self.epsilon)
         print("L = %.1f" % self.L)
@@ -48,12 +47,12 @@ class Museum:
 
         cameras = []
 
-        rank_x = sorted([x[0] for x in self.non_covered])
+        rank_x = sorted([x[0] for x in self.oeuvre])
         self.max_x = rank_x[-1]
         self.min_x = rank_x[0]
         self.L = abs(self.max_x - self.min_x)
 
-        rank_y = sorted([y[1] for y in self.non_covered])
+        rank_y = sorted([y[1] for y in self.oeuvre])
         self.max_y = rank_y[-1]
         self.min_y = rank_y[0]
         self.l = abs(self.max_y - self.min_y)
@@ -69,17 +68,19 @@ class Museum:
 
         return cameras
 
-
     def first_solve(self):
+
         self.to_cover = len(self.oeuvre)
 
         while self.to_cover > 0:
             print("sorting...")
             self.absent_cameras.sort(key=lambda x: x.efficiency, reverse=True)
-            camera = self.absent_cameras[0].pop()
+            camera = self.absent_cameras.pop(0)
             camera.active = True
+            self.total_cost += camera.price
             self.present_cameras.append(camera)
             for i in camera.cover_list:
+                self.to_cover -= 1
                 self.oeuvre[i][0] = True
                 for c in self.oeuvre[i][1]:
                     if c.active is False:
@@ -121,7 +122,6 @@ class Museum:
         else:
             dist = self.g_dist
 
-
         xvalues = self._xvalues(xc, dist)
         yvalues = self._yvalues(yc, dist)
 
@@ -129,29 +129,17 @@ class Museum:
             for y in yvalues:
                 if self.check_l2_dist((x,y), (xc, yc), dist):
                     if (x,y) in self.oeuvre.keys():
-                        if self.oeuvre[(x,y)][0] is False:
-                            coverefficiency += 1
-                            cover_list += [(x,y)]
-                            self.oeuvre[(x,y)].append(camera)
+                        coverefficiency += 1
+                        cover_list += [(x,y)]
+                        self.oeuvre[(x,y)][1].append(camera)
 
         camera.efficiency = coverefficiency /price
         camera.cover_list = cover_list
 
+        print("camera set")
+
         return camera
 
-    @property
-    def cost(self):
-
-        cost = 0
-        for i in self.quadrillage_p.values():
-            if self.model.getVal(i):
-                cost += self.p_price
-
-        for i in self.quadrillage_g.values():
-            if self.model.getVal(i):
-                cost += self.g_price
-
-        return cost
 
     def write_result(self, file_name):
 
@@ -170,11 +158,10 @@ class Museum:
 
 if __name__ == '__main__':
     start = time.time()
-    museum = Museum(1, 'input_very_simple.txt')
+    museum = Museum(2, 'input_9.txt')
     museum.first_solve()
     stop = time.time()
-    print("Cost = " + str(museum.cost))
-    museum.write_result("result2.txt")
+    print("Cost = " + str(museum.total_cost))
     print("Execution time = ", stop - start)
 
 
