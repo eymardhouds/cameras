@@ -145,6 +145,3 @@ if __name__ == '__main__':
     print("Solving time = ", stop2 - stop1)
     print("Execution time = ", stop2 - start)
     museum.write_result("result.txt")
-
-
-

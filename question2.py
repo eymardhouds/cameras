@@ -13,9 +13,16 @@ class Camera:
         self.active = False
 
 class Museum:
-
+    """
+    La classe Museum prend deux params en intialisation:
+    - Une largeur de quadrillage
+    - Un fichier d'input comme input_9.txt
+    Cette classe possede une méthode solve qui donne une bonne approximation du problème de la surveillance du musée
+    """
     def __init__(self, epsilon, file):
-
+        """
+        Initialisation du problème: on lit les données en input et on définit les variables principales
+        """
 
         with open(file, 'r') as doc:
             content = doc.readlines()
@@ -44,7 +51,9 @@ class Museum:
 
 
     def get_cameras(self, price):
-
+        """
+        On créé une liste de cameras que l'on pourrait potentiellement poser aux coins de chacune des cases de notre quadrillage
+        """
         cameras = []
 
         rank_x = sorted([x[0] for x in self.oeuvre])
@@ -69,7 +78,11 @@ class Museum:
         return cameras
 
     def first_solve(self):
-
+        """
+        Cette fonction ajoute les caméras une à une en prenant celle qui minimise l'augmentation du cout total.
+        Une fois une caméra ajoutée, on note les tableaux que l'on surveille à présent et on update les densités des caméras restantes
+        On s'arrête lorsque tous les tableaus (self.to_cover) sont surveillés
+        """
         self.to_cover = len(self.oeuvre)
 
         while self.to_cover > 0:
@@ -106,13 +119,18 @@ class Museum:
         return yvalues
 
     def check_l2_dist(self, a, b, range):
-
+        """
+        On check si la norme euclidienne d'un tableau à une caméras est comprise dans le rayon d'action de celle ci
+        """
         if pow(a[0] - b[0], 2) + pow(a[1] - b[1], 2) <= pow(range,2):
             return True
         return False
 
     def set_camera(self, xc, yc, price):
+        """
+        Lors de l'installation d'une camera on calcule son efficacité, c'est à dire le nombre de tableaux qu'elle est capable de surveiller
 
+        """
         camera = Camera(price, (xc,yc), 0, [])
         coverefficiency = 0
         cover_list = []
@@ -137,12 +155,14 @@ class Museum:
         camera.cover_list = cover_list
 
         print("camera set")
-
         return camera
 
 
     def write_result(self, file_name):
+        """
+        Cette fonction affiche les résultats et les écris dans un fichier propre de soumission prêt à être posté en ligne
 
+        """
         result = ""
 
         for camera in self.present_cameras:
@@ -152,6 +172,7 @@ class Museum:
             result_file.write(result)
 
 if __name__ == '__main__':
+
     start = time.time()
     museum = Museum(2, 'input_9.txt')
     stop1 = time.time()
