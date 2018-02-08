@@ -19,46 +19,50 @@ class Museum:
         for line in content[2:]:
             self.oeuvres.append((int(line.split(',')[0]), int(line.split(',')[1])))
 
+        self.id = 0
         self.epsilon = epsilon
         print(self.p_dist)
         print(self.oeuvres)
 
         self.model = Model("Camera")
 
-        self.quadrillage_p = self.get_quadrillage("p")
-        self.quadrillage_g = self.get_quadrillage("g")
+        self.quadrillage_p = self.get_quadrillage()
+        self.quadrillage_g = self.get_quadrillage()
+
+        print("Epsilon = %.1f" % self.epsilon)
+        print("L = %.1f" % self.L)
+        print("l = %.1f" % self.l)
 
         self.model.setObjective(quicksum(self.quadrillage_g[i] for i in self.quadrillage_g.keys()) * self.g_price +
                                 quicksum(self.quadrillage_p[i] for i in self.quadrillage_p.keys()) * self.p_price, "minimize")
 
-        print(self.quadrillage_p)
+    def get_quadrillage(self):
 
-    def get_quadrillage(self, id):
+        quadrillage = {}
 
-        self.quadrillage = {}
 
-        print("Epsilon = %.1f" % self.epsilon)
         rank_x = sorted([x[0] for x in self.oeuvres])
         self.max_x = rank_x[-1]
         self.min_x = rank_x[0]
         self.L = abs(self.max_x - self.min_x)
-
-        print("L = %.1f" % self.L)
 
         rank_y = sorted([y[1] for y in self.oeuvres])
         self.max_y = rank_y[-1]
         self.min_y = rank_y[0]
         self.l = abs(self.max_y - self.min_y)
 
-        print("l = %.1f" % self.l)
+        x = self.min_x
+        y = self.min_y
 
-        id = 0
-        for x in range(self.min_x, self.max_x + self.epsilon, self.epsilon):
-            for y in range(self.min_y, self.max_y + self.epsilon, self.epsilon):
-                id += 1
-                self.quadrillage[x,y] = (self.model.addVar(str(id), vtype="B"))
+        while x <= self.max_x + self.epsilon:
+            y = self.min_y
+            while y <= self.max_y + self.epsilon:
+                self.id += 1
+                quadrillage[x,y] = (self.model.addVar(str(self.id), vtype="B"))
+                y += self.epsilon
+            x += self.epsilon
 
-        return self.quadrillage
+        return quadrillage
 
     def add_constraints(self):
         for o in self.oeuvres:
@@ -76,7 +80,6 @@ class Museum:
         while x <= self.max_x and x <= x0 + dist:
             xvalues.append(x)
             x += self.epsilon
-
         return xvalues
 
     def _yvalues(self, y0, dist):
@@ -88,27 +91,63 @@ class Museum:
         while y <= self.max_y and y <= y0 + dist:
             yvalues.append(y)
             y += self.epsilon
-
         return yvalues
+
+    def check_l2_dist(self, a, b, range):
+
+        if pow(a[0] - b[0], 2) + pow(a[1] - b[1], 2) <= pow(range,2):
+            return True
+        return False
 
     def fetch_close_cam(self, o):
 
         camera_list = []
 
-        xvalues = self._xvalues(o[0], self.g_dist)
-        yvalues = self._yvalues(o[1], self.g_dist)
-        for x in xvalues:
-            for y in yvalues:
-                camera_list.append(self.quadrillage_g[x,y])
-
         xvalues = self._xvalues(o[0], self.p_dist)
         yvalues = self._yvalues(o[1], self.p_dist)
         for x in xvalues:
             for y in yvalues:
-                camera_list.append(self.quadrillage_p[x, y])
+                if self.check_l2_dist(o, (x,y), self.p_dist):
+                    camera_list.append(self.quadrillage_p[x, y])
+
+
+        xvalues = self._xvalues(o[0], self.g_dist)
+        yvalues = self._yvalues(o[1], self.g_dist)
+        for x in xvalues:
+            for y in yvalues:
+                if self.check_l2_dist(o, (x,y), self.g_dist):
+                    camera_list.append(self.quadrillage_g[x, y])
 
         return camera_list
 
+    @property
+    def cost(self):
+
+        cost = 0
+        for i in self.quadrillage_p.values():
+            if self.model.getVal(i):
+                cost += self.p_price
+
+        for i in self.quadrillage_g.values():
+            if self.model.getVal(i):
+                cost += self.g_price
+
+        return cost
+
+    def write_result(self, file_name):
+
+        result = ""
+
+        for coord, valeur in self.quadrillage_p.items():
+            if self.model.getVal(valeur)  == True:
+                result += ("1" + "," + str(int(coord[0])) + "," + str(int(coord[1])) + "\n")
+
+        for coord, valeur in self.quadrillage_g.items():
+            if self.model.getVal(valeur)  == True:
+                result += ("2" + "," + str(int(coord[0])) + "," + str(int(coord[1])) + "\n")
+
+        with open(file_name, "w") as result_file:
+            result_file.write(result)
 
 if __name__ == '__main__':
     start = time.time()
@@ -116,6 +155,8 @@ if __name__ == '__main__':
     museum.add_constraints()
     museum.solve()
     stop = time.time()
+    print("Cost = " + str(museum.cost))
+    museum.write_result("result.txt")
     print("Execution time = ", stop - start)
 
 
