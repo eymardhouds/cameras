@@ -137,7 +137,6 @@ class Museum:
         camera.cover_list = cover_list
 
         print("camera set")
-
         return camera
 
 
@@ -157,11 +156,10 @@ class Museum:
             result_file.write(result)
 
 if __name__ == '__main__':
+    
     start = time.time()
     museum = Museum(2, 'input_9.txt')
     museum.first_solve()
     stop = time.time()
     print("Cost = " + str(museum.total_cost))
     print("Execution time = ", stop - start)
-
-

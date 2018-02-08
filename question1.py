@@ -157,5 +157,3 @@ if __name__ == '__main__':
     print("Cost = " + str(museum.cost))
     museum.write_result("result.txt")
     print("Execution time = ", stop - start)
-
-
