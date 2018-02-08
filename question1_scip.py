@@ -15,7 +15,7 @@ y = model.addVar("n2")
 model.addCons(2 * x + y <= 10, "bound costs")
 model.addCons(2 * x + 5 * y <= 30, "bound costs")
 
-model.setObjective(x + y, "maximize")  # autre possibilité "minimize"
+model.setObjective(x + y, "maximize")  # autre possibilite "minimize"
 model.optimize()
 
 print("Optimal value: %f" % model.getObjVal())
